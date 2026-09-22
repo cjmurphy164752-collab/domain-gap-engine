@@ -93,7 +93,10 @@ The first manual run does not send a Telegram message.
 
 1. Run `domain-gap serve --config local/sensors/config.local.json` as a persistent
    local service. Keep it and n8n running; sleeping/offline machines miss schedules.
-2. Import `n8n-workflows.local.json` into n8n. All three workflows start inactive.
+2. In n8n's UI, import `n8n-collection.local.json`, `n8n-delivery.local.json`, and
+   `n8n-telegram.local.json` separately. Alternatively, the n8n CLI accepts the
+   combined bundle: `n8n import:workflow --input=local/sensors/n8n-workflows.local.json`.
+   All three workflows start inactive.
 3. In n8n, create a **Header Auth** credential using the header and randomly
    generated secret from `delivery.local.json`. Assign it to both scheduled HTTP
    nodes and the report webhook. Never paste this file into an issue or commit it.
