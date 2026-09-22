@@ -135,7 +135,14 @@ return [{json:{report_id:$('Validate').first().json.report_id,
         "connections": connections,
         "settings": {"executionOrder": "v1"},
     }
-    return [scheduled("collection", "collect", hour), scheduled("delivery", "deliver", 7), delivery]
+    result = [
+        scheduled("collection", "collect", hour),
+        scheduled("delivery", "deliver", 7),
+        delivery,
+    ]
+    for i, workflow in enumerate(result):
+        workflow["id"] = "gap" + hashlib.sha256(f"{slug}:{i}".encode()).hexdigest()[:16]
+    return result
 
 
 def initialize(
@@ -196,7 +203,10 @@ def initialize(
         },
     )
     atomic_write(directory / "evidence.local.jsonl", b"")
-    save(directory / "n8n-workflows.local.json", workflows(domain, slug, port, hour, timezone))
+    flows = workflows(domain, slug, port, hour, timezone)
+    save(directory / "n8n-workflows.local.json", flows)
+    for name, flow in zip(("collection", "delivery", "telegram"), flows):
+        save(directory / f"n8n-{name}.local.json", flow)
     return directory
 
 
